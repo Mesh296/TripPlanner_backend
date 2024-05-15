@@ -1,20 +1,21 @@
 version: '3.8'  
 
+networks:
+  app-network:
+
 services:
   auth:
     build:
       context: ./auth
       dockerfile: Dockerfile
     ports:
-      - "8001:8001"
-    environment:
-      DB_USER: ${DB_USER}
-      DB_NAME: ${DB_NAME}
-      DB_PASS: ${DB_PASS}
-      SECRET_KEY : ${SECRET_KEY}
-      DB_HOST: "db"
+      - "${AUTH_PORT}:8001"
+    env_file:
+      - ./.env
     depends_on:
       - db
+    networks:
+      - app-network
     restart: always
 
   activity:
@@ -22,16 +23,14 @@ services:
       context: ./activities
       dockerfile: Dockerfile
     ports:
-      - "8003:8003"
-    environment:
-      DB_USER: ${DB_USER}
-      DB_NAME: ${DB_NAME}
-      DB_PASS: ${DB_PASS}
-      SECRET_KEY : ${SECRET_KEY}
-      DB_HOST: "db"
+      - "${ACTIVITY_PORT}:8003"
+    env_file:
+      - ./.env
     depends_on:
       - db
       - auth
+    networks:
+      - app-network
     restart: always
 
   location:
@@ -39,52 +38,46 @@ services:
       context: ./locations
       dockerfile: Dockerfile
     ports:
-      - "8006:8006"
-    environment:
-      DB_USER: ${DB_USER}
-      DB_NAME: ${DB_NAME}
-      DB_PASS: ${DB_PASS}
-      SECRET_KEY : ${SECRET_KEY}
-      DB_HOST: "db"
+      - "${LOCATION_PORT}:8006"
+    env_file:
+      - ./.env
     depends_on:
       - db
       - auth
       - activity
+    networks:
+      - app-network
     restart: always
-  
+
   offer:
     build:
       context: ./offers
       dockerfile: Dockerfile
     ports:
-      - "8009:8009"
-    environment:
-      DB_USER: ${DB_USER}
-      DB_NAME: ${DB_NAME}
-      DB_PASS: ${DB_PASS}
-      SECRET_KEY : ${SECRET_KEY}
-      DB_HOST: "db"
+      - "${OFFER_PORT}:8009"
+    env_file:
+      - ./.env
     depends_on:
       - db
       - auth
       - location
+    networks:
+      - app-network
     restart: always
-  
+
   trip:
     build:
       context: ./trips
       dockerfile: Dockerfile
     ports:
-      - "8002:8002"
-    environment:
-      DB_USER: ${DB_USER}
-      DB_NAME: ${DB_NAME}
-      DB_PASS: ${DB_PASS}
-      SECRET_KEY : ${SECRET_KEY}
-      DB_HOST: "db"
+      - "${TRIP_PORT}:8002"
+    env_file:
+      - ./.env
     depends_on:
       - db
       - auth
+    networks:
+      - app-network
     restart: always
 
   review:
@@ -92,16 +85,14 @@ services:
       context: ./reviews
       dockerfile: Dockerfile
     ports:
-      - "8005:8005"
-    environment:
-      DB_USER: ${DB_USER}
-      DB_NAME: ${DB_NAME}
-      DB_PASS: ${DB_PASS}
-      SECRET_KEY : ${SECRET_KEY}
-      DB_HOST: "db"
+      - "${REVIEW_PORT}:8005"
+    env_file:
+      - ./.env
     depends_on:
       - db
       - location
+    networks:
+      - app-network
     restart: always
 
   gateway:
@@ -109,7 +100,7 @@ services:
       context: ./gateway
       dockerfile: Dockerfile
     ports:
-      - "8000:8000"
+      - "${GATEWAY_PORT}:8000"
     depends_on:
       - trip
       - location
@@ -117,18 +108,22 @@ services:
       - offer
       - activity
       - review
+    networks:
+      - app-network
     restart: always
 
   db:
     image: postgres:latest
     ports:
-      - "5432:5432"
+      - "${DB_PORT}:5432"
     environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASS}
+      POSTGRES_DB: ${DB_NAME}
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
 
 volumes:
   postgres_data:
