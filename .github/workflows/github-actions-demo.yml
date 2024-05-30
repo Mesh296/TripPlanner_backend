@@ -1,0 +1,31 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - dev-minh
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      VPS_USERNAME: ${{ secrets.VPS_USERNAME }}
+      VPS_HOSTNAME: ${{ secrets.VPS_HOSTNAME }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 20.x
+      - name: Setup
+        run: |
+          sudo apt-get update
+          sudo apt-get install rsync -y
+          mkdir "$HOME/.ssh"
+          echo "${{ secrets.VPS_CRSKEY }}" > "$HOME/.ssh/key"
+          chmod 600 "$HOME/.ssh/key"
+      - name: Delivery
+        run: |
+          rsync -e "ssh -p 23348 -i $HOME/.ssh/key -o StrictHostKeyChecking=no" -avz --exclude '.git' --chown=github:www-data --chmod=Dg=rwx,Fg=rwx --archive --compress --delete . $VPS_USERNAME@$VPS_HOSTNAME:/home/Minh/Documents/itmo-back-end
+      - name: Building on server
+        run: |
+          ssh -p 23348 -i $HOME/.ssh/key $VPS_USERNAME@$VPS_HOSTNAME 'cd /home/Minh/Documents/itmo-back-end/labs/K33392/Minh/lab-3/ && docker compose up -d --build'

@@ -15,7 +15,6 @@ services:
       DB_HOST: "db"
     depends_on:
       - db
-    restart: always
 
   activity:
     build:
@@ -32,7 +31,6 @@ services:
     depends_on:
       - db
       - auth
-    restart: always
 
   location:
     build:
@@ -50,7 +48,6 @@ services:
       - db
       - auth
       - activity
-    restart: always
   
   offer:
     build:
@@ -68,7 +65,6 @@ services:
       - db
       - auth
       - location
-    restart: always
   
   trip:
     build:
@@ -85,7 +81,6 @@ services:
     depends_on:
       - db
       - auth
-    restart: always
 
   review:
     build:
@@ -102,7 +97,6 @@ services:
     depends_on:
       - db
       - location
-    restart: always
 
   gateway:
     build:
@@ -117,7 +111,6 @@ services:
       - offer
       - activity
       - review
-    restart: always
 
   db:
     image: postgres:latest
