@@ -3,30 +3,32 @@ name: Deploy
 on:
   push:
     branches:
-      - dev-minh
+      - main
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    env:
-      SCRIPT_BEFORE: ls
-      VPS_USERNAME: ${{ secrets.VPS_USERNAME }}
-      VPS_HOSTNAME: ${{ secrets.VPS_HOSTNAME }}
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20.x
-      - name: Setup
-        run: |
-          sudo apt-get update
-          sudo apt-get install rsync -y
-          mkdir "$HOME/.ssh"
-          echo "${{ secrets.VPS_CRSKEY }}" > "$HOME/.ssh/key"
-          chmod 600 "$HOME/.ssh/key"
-      - name: Delivery
-        run: |
-          rsync -e "ssh -p 22 -i $HOME/.ssh/key -o StrictHostKeyChecking=no" -avz --exclude '.git' --chown=github:www-data --chmod=Dg=rwx,Fg=rwx --archive --compress --delete . $VPS_USERNAME@$VPS_HOSTNAME:/home/Minh/Documents/itmo-back-end
-      - name: Building on server
-        run: |
-          ssh -p 22 -i $HOME/.ssh/key $VPS_USERNAME@$VPS_HOSTNAME 'cd /home/Minh/Documents/itmo-back-end/labs/K33392/Minh/lab-3/ && docker compose up -d --build'
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Setup SSH
+      uses: webfactory/ssh-agent@v0.5.3
+      with:
+        ssh-private-key: ${{ secrets.VPS_PRIVATE_KEY }}
+
+    - name: Deploy to server
+      env:
+        VPS_SERVER_NAME: ${{ secrets.VPS_SERVER_NAME }}
+        VPS_USER_NAME: ${{ secrets.VPS_USER_NAME }}
+        GIT_USERNAME: ${{ secrets.GIT_USERNAME }}
+        GIT_PASSWORD: ${{ secrets.GIT_PASSWORD }}
+      run: |
+        ssh -o StrictHostKeyChecking=no ${{ env.VPS_USER_NAME }}@${{ env.VPS_SERVER_NAME }} "
+        mkdir -p /home/${{ env.VPS_USER_NAME }}/deployed_project &&
+        cd /home/ubuntu/project/hw6_backend &&
+        git remote set-url origin https://${{ env.GIT_USERNAME }}:${{ env.GIT_PASSWORD }}@github.com/${{ env.GIT_USERNAME }}/hw6_backend.git &&
+        git pull origin main &&
+        sudo docker-compose up --build -d &&
+        echo 'Deployment completed!'"
