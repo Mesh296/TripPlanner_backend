@@ -25,7 +25,7 @@ jobs:
           chmod 600 "$HOME/.ssh/key"
       - name: Delivery
         run: |
-          rsync -e "ssh -p 23348 -i $HOME/.ssh/key -o StrictHostKeyChecking=no" -avz --exclude '.git' --chown=github:www-data --chmod=Dg=rwx,Fg=rwx --archive --compress --delete . $VPS_USERNAME@$VPS_HOSTNAME:/home/Minh/Documents/itmo-back-end
+          rsync -e "ssh -p 22 -i $HOME/.ssh/key -o StrictHostKeyChecking=no" -avz --exclude '.git' --chown=github:www-data --chmod=Dg=rwx,Fg=rwx --archive --compress --delete . $VPS_USERNAME@$VPS_HOSTNAME:/home/Minh/Documents/itmo-back-end
       - name: Building on server
         run: |
-          ssh -p 23348 -i $HOME/.ssh/key $VPS_USERNAME@$VPS_HOSTNAME 'cd /home/Minh/Documents/itmo-back-end/labs/K33392/Minh/lab-3/ && docker compose up -d --build'
+          ssh -p 22 -i $HOME/.ssh/key $VPS_USERNAME@$VPS_HOSTNAME 'cd /home/Minh/Documents/itmo-back-end/labs/K33392/Minh/lab-3/ && docker compose up -d --build'
