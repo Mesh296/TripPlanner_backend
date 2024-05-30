@@ -9,6 +9,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     env:
+      SCRIPT_BEFORE: ls
       VPS_USERNAME: ${{ secrets.VPS_USERNAME }}
       VPS_HOSTNAME: ${{ secrets.VPS_HOSTNAME }}
     steps:
