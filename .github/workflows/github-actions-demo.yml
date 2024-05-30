@@ -16,17 +16,17 @@ jobs:
     - name: Setup SSH
       uses: webfactory/ssh-agent@v0.5.3
       with:
-        ssh-private-key: ${{ secrets.VPS_PRIVATE_KEY }}
+        ssh-private-key: ${{ secrets.VPS_SCRKEY }}
 
     - name: Deploy to server
       env:
-        VPS_SERVER_NAME: ${{ secrets.VPS_SERVER_NAME }}
-        VPS_USER_NAME: ${{ secrets.VPS_USER_NAME }}
+        VPS_HOST: ${{ secrets.VPS_HOST }}
+        VPS_USERNAME: ${{ secrets.VPS_USERNAME }}
         GIT_USERNAME: ${{ secrets.GIT_USERNAME }}
         GIT_PASSWORD: ${{ secrets.GIT_PASSWORD }}
       run: |
-        ssh -o StrictHostKeyChecking=no ${{ env.VPS_USER_NAME }}@${{ env.VPS_SERVER_NAME }} "
-        mkdir -p /home/${{ env.VPS_USER_NAME }}/deployed_project &&
+        ssh -o StrictHostKeyChecking=no ${{ env.VPS_USERNAME }}@${{ env.VPS_HOST }} "
+        mkdir -p /home/${{ env.VPS_USERNAME }}/deployed_project &&
         cd /home/ubuntu/project/hw6_backend &&
         git remote set-url origin https://${{ env.GIT_USERNAME }}:${{ env.GIT_PASSWORD }}@github.com/${{ env.GIT_USERNAME }}/hw6_backend.git &&
         git pull origin main &&
