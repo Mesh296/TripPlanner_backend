@@ -94,7 +94,3 @@ src/
 ## Testing
 
 Use [Postman](https://www.postman.com/) or a similar tool to test the API. Sample endpoints have been tested and documentation is included in the repository.
-
-## Contributions
-
-If you would like to contribute to the project, please submit a pull request or create an issue on GitHub.
