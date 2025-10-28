@@ -1,45 +1,42 @@
 # Trip Planner API
 
 Trip Planner API is a RESTful microservice system built with Express.js and TypeScript.  
-It allows users to plan, manage, and receive recommendations for trips based on their personal preferences.
+It provides backend functionality for a trip planning application, including user management, trip creation, and travel recommendations based on user interests.
 
 ---
 
 ## Overview
 
-The system is divided into multiple independent services:
-- **auth** – Handles user registration and authentication.
-- **trips** – Manages trip creation, updates, and deletion.
-- **activities** – Provides activities based on user interests.
-- **locations** – Stores and retrieves location data.
-- **offers** – Suggests offers and travel recommendations.
-- **reviews** – Manages user reviews and feedback.
-- **gateway** – Acts as an API Gateway for routing requests between services.
-
-Each service runs independently and communicates through HTTP requests.
+Trip Planner is a service assistant for planning travel experiences.  
+It supports the following core features:
+- User registration and authentication
+- Profile creation and management
+- Trip creation and modification
+- Search among available offers
+- Personalized suggestions for new trips based on user interests
 
 ---
 
 ## Features
 
-1. **User Registration and Authentication**
-   - User account creation and login.
-   - JWT-based authentication and authorization.
+1. **User Management**
+   - User registration and login with JWT authentication
+   - Profile creation and updates
 
-2. **Profile Management**
-   - Retrieve and update user information.
-   - Store preferences and travel history.
+2. **Trip Management**
+   - Create, edit, and delete trips
+   - Manage trip details (destination, duration, budget, etc.)
 
-3. **Trip Management**
-   - Create, edit, and delete trips.
-   - Retrieve a list of trips for a user.
+3. **Recommendations**
+   - Retrieve offers and activities matching user preferences
+   - Get personalized trip suggestions
 
-4. **Recommendations**
-   - Suggest destinations, offers, and activities based on user interests.
+4. **Activities and Locations**
+   - Retrieve activities, locations, and offers associated with a user’s interests
 
-5. **Personalized Suggestions**
-   - Provide trip ideas tailored to user preferences and trip details.
-
+5. **Reviews**
+   - Manage and view trip or location reviews
+   
 ---
 
 ## Project Structure
@@ -109,48 +106,129 @@ src/
 
 ## API Endpoints
 
-### Authentication
+### User
 
-| Method | Endpoint         | Description                     |
-| ------ | ---------------- | ------------------------------- |
-| POST   | `/auth/register` | Register a new user             |
-| POST   | `/auth/login`    | Log in with an existing account |
+#### Register
+**POST** `/v1/register/`  
+Registers a new user.
 
-### Profile
+**Request body:**
+```json
+{
+  "email": "dung@gmail.com",
+  "name": "Viet Dung",
+  "password": "depchai"
+}
+````
 
-| Method | Endpoint   | Description                  |
-| ------ | ---------- | ---------------------------- |
-| GET    | `/profile` | Retrieve profile information |
-| PUT    | `/profile` | Update profile details       |
+#### Login
+
+**POST** `/v1/login/`
+Authenticates a user and returns an access token.
+
+**Request body:**
+
+```json
+{
+  "email": "truong@gmail.com",
+  "password": "depchai"
+}
+```
+
+**Headers:**
+
+```
+Authorization: Bearer <token>
+```
+
+---
 
 ### Trips
 
-| Method | Endpoint     | Description         |
-| ------ | ------------ | ------------------- |
-| POST   | `/trips`     | Create a new trip   |
-| GET    | `/trips`     | Retrieve all trips  |
-| PUT    | `/trips/:id` | Update trip details |
-| DELETE | `/trips/:id` | Delete a trip       |
+| Method | Endpoint         | Description             |
+| ------ | ---------------- | ----------------------- |
+| POST   | `/v1/trips/`     | Create a new trip       |
+| GET    | `/v1/trips/`     | Retrieve all trips      |
+| PUT    | `/v1/trips/:id/` | Update trip information |
+| DELETE | `/v1/trips/:id/` | Delete a trip           |
 
-### Offers
+**Example body:**
 
-| Method | Endpoint                             | Description               |
-| ------ | ------------------------------------ | ------------------------- |
-| GET    | `/offers`                            | Retrieve all offers       |
-| GET    | `/offers?price=<value>&type=<value>` | Filter offers by criteria |
+```json
+{
+  "title": "Summer in Paris",
+  "destination": "France",
+  "start_date": "2025-06-10",
+  "end_date": "2025-06-20",
+  "budget": 1500
+}
+```
 
-### Activities
+---
 
-| Method | Endpoint      | Description                              |
-| ------ | ------------- | ---------------------------------------- |
-| GET    | `/activities` | Retrieve activities based on preferences |
+### Reviews
+
+| Method | Endpoint           | Description          |
+| ------ | ------------------ | -------------------- |
+| POST   | `/v1/reviews/`     | Create a new review  |
+| GET    | `/v1/reviews/`     | Retrieve all reviews |
+| DELETE | `/v1/reviews/:id/` | Delete a review      |
+
+---
 
 ### Locations
 
-| Method | Endpoint     | Description                                  |
-| ------ | ------------ | -------------------------------------------- |
-| GET    | `/locations` | Retrieve locations related to user interests |
+| Method | Endpoint             | Description               |
+| ------ | -------------------- | ------------------------- |
+| GET    | `/v1/locations/`     | Retrieve all locations    |
+| GET    | `/v1/locations/:id/` | Retrieve location details |
 
+---
+
+### Activities
+
+| Method | Endpoint              | Description               |
+| ------ | --------------------- | ------------------------- |
+| GET    | `/v1/activities/`     | Retrieve all activities   |
+| GET    | `/v1/activities/:id/` | Retrieve activity details |
+
+---
+
+### User Activities (User Interests)
+
+| Method | Endpoint                | Description                          |
+| ------ | ----------------------- | ------------------------------------ |
+| GET    | `/v1/users-activities/` | Retrieve user’s preferred activities |
+| POST   | `/v1/users-activities/` | Add a new activity to user interests |
+
+---
+
+### Trips Locations
+
+| Method | Endpoint               | Description                              |
+| ------ | ---------------------- | ---------------------------------------- |
+| GET    | `/v1/trips-locations/` | Retrieve locations associated with trips |
+| POST   | `/v1/trips-locations/` | Link a location to a trip                |
+
+---
+
+### Locations Activities
+
+| Method | Endpoint                    | Description                             |
+| ------ | --------------------------- | --------------------------------------- |
+| GET    | `/v1/locations-activities/` | Retrieve activities linked to locations |
+| POST   | `/v1/locations-activities/` | Link an activity to a location          |
+
+---
+
+### Offers
+
+| Method | Endpoint                                | Description                    |
+| ------ | --------------------------------------- | ------------------------------ |
+| GET    | `/v1/offers/`                           | Retrieve all offers            |
+| GET    | `/v1/offers?price=<value>&type=<value>` | Filter offers by price or type |
+
+```
 ---
 
 ## Docker Services
@@ -182,7 +260,6 @@ Example commands can be found in the API documentation provided in the repositor
 * JWT authentication for protected routes
 * Environment variables stored in `.env`
 * CORS enabled for client access
-* Recommended: use Helmet and rate limiting for production
 
 ```
 
