@@ -1,45 +1,72 @@
 # Trip Planner API
 
-**Trip Planner API** is a RESTful service built with Express.js and TypeScript. The application supports users in planning trips, from registration and trip creation to searching for recommendations based on personal preferences.
+Trip Planner API is a RESTful microservice system built with Express.js and TypeScript.  
+It allows users to plan, manage, and receive recommendations for trips based on their personal preferences.
 
-## Key Features
+---
+
+## Overview
+
+The system is divided into multiple independent services:
+- **auth** – Handles user registration and authentication.
+- **trips** – Manages trip creation, updates, and deletion.
+- **activities** – Provides activities based on user interests.
+- **locations** – Stores and retrieves location data.
+- **offers** – Suggests offers and travel recommendations.
+- **reviews** – Manages user reviews and feedback.
+- **gateway** – Acts as an API Gateway for routing requests between services.
+
+Each service runs independently and communicates through HTTP requests.
+
+---
+
+## Features
 
 1. **User Registration and Authentication**
-   - Supports account creation and user authentication.
+   - User account creation and login.
+   - JWT-based authentication and authorization.
 
 2. **Profile Management**
-   - Users can create and update their personal information, including preferences and activity history.
+   - Retrieve and update user information.
+   - Store preferences and travel history.
 
-3. **Trip Creation and Management**
-   - Create new trips with detailed information.
-   - Update or delete previously created trips.
+3. **Trip Management**
+   - Create, edit, and delete trips.
+   - Retrieve a list of trips for a user.
 
-4. **Travel Recommendations**
-   - Based on personal interests, the system suggests destinations or activities that match user preferences.
+4. **Recommendations**
+   - Suggest destinations, offers, and activities based on user interests.
 
-5. **Personalized Suggestions for New Trips**
-   - Provides tailored suggestions for newly created trips based on user preferences and trip information.
+5. **Personalized Suggestions**
+   - Provide trip ideas tailored to user preferences and trip details.
+
+---
 
 ## Project Structure
 
-The project follows a standard folder structure for source code management:
+```
 
-```
 src/
-├── controllers/
-├── models/
-├── middlewares/
-├── routes/
-├── services/
-└── utils/
-```
+├── activities/
+├── auth/
+├── gateway/
+├── locations/
+├── offers/
+├── trips/
+└── reviews/
+
+````
+
+---
 
 ## Requirements
 
-- **Node.js** >= 16
-- **TypeScript** >= 5.4
-- **Express.js** >= 4.18
-- **PostgreSQL**
+- Node.js >= 16  
+- TypeScript >= 5.4  
+- Express.js >= 4.18  
+- PostgreSQL (latest)
+
+---
 
 ## Installation
 
@@ -47,50 +74,115 @@ src/
    ```bash
    git clone https://github.com/your-username/trip-planner.git
    cd trip-planner
-   ```
+````
 
 2. Install dependencies:
+
    ```bash
    npm install
    ```
 
-3. Configure the database and environment variables:
-   - Create a `.env` file from `.env.example` and fill in the necessary details.
+3. Create a `.env` file from `.env.example` and set the required variables:
 
-4. Start the server:
+   ```env
+   DB_USER=postgres
+   DB_PASS=password
+   DB_NAME=tripplanner
+   DB_HOST=db
+   SECRET_KEY=your_secret_key
+   PORT=8000
+   ```
+
+4. Start the development server:
+
    ```bash
    npm run dev
    ```
 
-## Usage
+5. Or start all services using Docker Compose:
 
-### User Registration and Authentication
+   ```bash
+   docker-compose up --build
+   ```
 
-- **POST** `/auth/register` - Register a new account.
-- **POST** `/auth/login` - Log in with an existing account.
+---
 
-### Profile Management
+## API Endpoints
 
-- **GET** `/profile` - View profile information.
-- **PUT** `/profile` - Update profile details.
+### Authentication
 
-### Trip Management
+| Method | Endpoint         | Description                     |
+| ------ | ---------------- | ------------------------------- |
+| POST   | `/auth/register` | Register a new user             |
+| POST   | `/auth/login`    | Log in with an existing account |
 
-- **POST** `/trips` - Create a new trip.
-- **GET** `/trips` - Retrieve a list of trips.
-- **PUT** `/trips/:id` - Update trip details.
-- **DELETE** `/trips/:id` - Delete a trip.
+### Profile
 
-### Recommendations
+| Method | Endpoint   | Description                  |
+| ------ | ---------- | ---------------------------- |
+| GET    | `/profile` | Retrieve profile information |
+| PUT    | `/profile` | Update profile details       |
 
-- **GET** `/offers` - Retrieve all travel suggestions.
-- **GET** `/offers?price=<value>&type=<value>` - Search for suggestions based on criteria.
+### Trips
 
-### Interest-Based Suggestions
+| Method | Endpoint     | Description         |
+| ------ | ------------ | ------------------- |
+| POST   | `/trips`     | Create a new trip   |
+| GET    | `/trips`     | Retrieve all trips  |
+| PUT    | `/trips/:id` | Update trip details |
+| DELETE | `/trips/:id` | Delete a trip       |
 
-- **GET** `/activities` - Retrieve a list of activities that match user preferences.
-- **GET** `/locations` - Find locations related to user interests.
+### Offers
+
+| Method | Endpoint                             | Description               |
+| ------ | ------------------------------------ | ------------------------- |
+| GET    | `/offers`                            | Retrieve all offers       |
+| GET    | `/offers?price=<value>&type=<value>` | Filter offers by criteria |
+
+### Activities
+
+| Method | Endpoint      | Description                              |
+| ------ | ------------- | ---------------------------------------- |
+| GET    | `/activities` | Retrieve activities based on preferences |
+
+### Locations
+
+| Method | Endpoint     | Description                                  |
+| ------ | ------------ | -------------------------------------------- |
+| GET    | `/locations` | Retrieve locations related to user interests |
+
+---
+
+## Docker Services
+
+Each service runs as a separate container managed by Docker Compose.
+
+| Service  | Port | Description                        |
+| -------- | ---- | ---------------------------------- |
+| gateway  | 8000 | API Gateway                        |
+| auth     | 8001 | User authentication service        |
+| trip     | 8002 | Trip management service            |
+| activity | 8003 | Activity recommendation service    |
+| review   | 8005 | Review management service          |
+| location | 8006 | Location management service        |
+| offer    | 8009 | Offers and recommendations service |
+| db       | 5432 | PostgreSQL database                |
+
+---
 
 ## Testing
 
-Use [Postman](https://www.postman.com/) or a similar tool to test the API. Sample endpoints have been tested and documentation is included in the repository.
+Use [Postman](https://www.postman.com/) or similar tools to test endpoints.
+Example commands can be found in the API documentation provided in the repository.
+
+---
+
+## Security
+
+* JWT authentication for protected routes
+* Environment variables stored in `.env`
+* CORS enabled for client access
+* Recommended: use Helmet and rate limiting for production
+
+```
+
